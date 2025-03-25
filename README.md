@@ -31,13 +31,30 @@ rome-project/
 
 ---
 
+## Requirements
+
+Before running this project, ensure you have the following installed:
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v14.x or higher)
+- [Go](https://golang.org/) (v1.16 or higher)
+- [PostgreSQL](https://www.postgresql.org/) (for logging messages)
+- [npm](https://www.npmjs.com/) (comes with Node.js)
+
+You can verify the installation by running:
+```bash
+node -v
+go version
+npm -v
+```
+
 ## 🚀 Getting Started
 
 ### 1. Clone the repo
 
 ```bash
 git clone https://github.com/SorravichL/Rome.git
-cd Rome
+cd Rome/rome-project
 ```
 
 ### 2. Set up environment
@@ -72,10 +89,10 @@ go mod tidy
 
 ---
 
-### 4. Generate OpenAPI types
+### 4. Generate OpenAPI types(use git bash instead of terminal)
 
 ```bash
-chmod +x scripts/generate.sh
+chmod +x scripts/generate.sh scripts/clean.sh scripts/generate.sh
 ./scripts/generate.sh
 ```
 
@@ -91,7 +108,7 @@ npx prisma generate
 
 ---
 
-### 6. Start both services
+### 6. Start both services(use git bash instead of terminal)
 
 ```bash
 chmod +x scripts/dev.sh
@@ -118,7 +135,7 @@ cd ts-backend && npm run format
 cd go-backend && go fmt ./...
 ```
 
-Or use the one-click all-in-one:
+Or use the one-click all-in-one:(use git bash instead of terminal)
 
 ```bash
 chmod +x scripts/clean.sh
@@ -164,7 +181,7 @@ You can test using our shared database. No setup required!
 
 - 🛠️ Prisma Ready
 - 📦 Logs messages with `from`, `to`, `message`, and `timestamp`
-### 🌐 External (Local Development):
+### 🌐 External (Local Development), Feel free to use my database for test:
 
 Feel free to use my database for test
 DATABASE_URL=postgresql://rome_db_user:FSDH7AOOUOXuUeIGOLPalKLsO0YwOHfS@dpg-cvh85ldrie7s73eld5s0-a.singapore-postgres.render.com/rome_db
