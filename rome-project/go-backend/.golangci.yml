@@ -1,0 +1,27 @@
+run:
+  timeout: 60s
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - gosimple
+    - unused
+    - gofmt
+    - revive
+
+linters-settings:
+  revive:
+    severity: warning
+    rules:
+      - name: indent-error-flow
+      - name: var-naming
+      - name: unused-parameter
+
+
+issues:
+  exclude-use-default: false
+
+exclude:
+  - gen/.*\.go

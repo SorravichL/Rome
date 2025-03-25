@@ -1,32 +1,45 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
+  lint:
+    name: Lint Go & TypeScript
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18'
+      # ----- TypeScript -----
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
 
-    - name: Install & Lint TS
-      run: |
-        cd ts-backend
-        npm install
-        npx tsc --noEmit
-        npx eslint src/
+      - name: Install TypeScript dependencies
+        working-directory: ./ts-backend
+        run: npm install
 
-    - name: Setup Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.20'
+      - name: Run TypeScript lint
+        working-directory: ./ts-backend
+        run: npm run lint
 
-    - name: Build Go
-      run: |
-        cd go-backend
-        go build
+      # ----- Go -----
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s latest
+          echo "$(pwd)/bin" >> $GITHUB_PATH
+
+      - name: Run Go lint
+        working-directory: ./go-backend
+        run: ./bin/golangci-lint run
