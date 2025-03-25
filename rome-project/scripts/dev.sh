@@ -16,8 +16,8 @@ TS_PID=$!
 cd ..
 
 echo "Both services are running:"
-echo "Go backend:        http://localhost:5001/user"
-echo "TypeScript backend: http://localhost:5002/ts-user"
+echo "Go backend:        http://localhost:5001"
+echo "TypeScript backend: http://localhost:5002"
 
 # Clean up on exit
 trap "kill $GO_PID $TS_PID" EXIT

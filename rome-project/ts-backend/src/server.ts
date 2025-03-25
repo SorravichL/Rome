@@ -3,6 +3,9 @@ import axios from "axios";
 import dotenv from "dotenv";
 import { paths } from "../gen/api";
 import path from "path";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 // Load .env from ts-backend/.env
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -35,11 +38,29 @@ app.post(
 );
 
 // Receive message from Go
-app.post("/log", (req: Request<{}, {}, MessageType>, res: Response) => {
+app.post("/log", async (req: Request<{}, {}, MessageType>, res: Response) => {
   const { from, to, message, date } = req.body;
   console.log(`Message from ${from} to ${to} @ ${date}: ${message}`);
+
+  await prisma.message.create({
+    data: {
+      sender: from,
+      receiver: to,
+      message,
+      timestamp: new Date(date),
+    },
+  });
+
   res.status(200).json({ status: "received" });
 });
+
+app.get("/logs", async (_req, res) => {
+    const logs = await prisma.message.findMany({
+      orderBy: { timestamp: "desc" },
+      take: 10
+    });
+    res.json(logs);
+  });
 
 app.listen(PORT, () => {
   console.log(`TypeScript backend is running on port ${PORT}`);
