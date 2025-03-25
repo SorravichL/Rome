@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
+	"github.com/joho/godotenv"
 )
 
 // Message defines the structure for communication
@@ -33,7 +35,13 @@ func handleSend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := http.Post("http://localhost:5002/log", "application/json", bytes.NewBuffer(jsonData))
+	// Get TS backend URL from environment (default to localhost)
+	tsURL := os.Getenv("TS_BACKEND_URL")
+	if tsURL == "" {
+		tsURL = "http://localhost:5002/log"
+	}
+
+	resp, err := http.Post(tsURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Println("Error forwarding message to TypeScript:", err)
 		http.Error(w, "Failed to forward message", http.StatusBadGateway)
@@ -68,12 +76,20 @@ func handleLog(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	godotenv.Load()
+	
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5001"
+	}
+	addr := ":" + port
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/send", handleSend)
 	mux.HandleFunc("/log", handleLog)
 
-	log.Println("Go backend is running at http://localhost:5001")
-	if err := http.ListenAndServe(":5001", mux); err != nil {
+	log.Printf("Go backend is running on port %s", port)
+	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatal("Server error:", err)
 	}
 }

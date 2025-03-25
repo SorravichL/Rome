@@ -1,9 +1,15 @@
 import express, { Request, Response } from "express";
 import axios from "axios";
+import dotenv from "dotenv";
 import { paths } from "../gen/api";
+import path from "path";
+
+// Load .env from ts-backend/.env
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
-const PORT = 5002;
+const PORT = process.env.PORT || 5002;
+const GO_BACKEND_URL = process.env.GO_BACKEND_URL || "http://localhost:5001/log";
 
 app.use(express.json());
 
@@ -18,7 +24,7 @@ app.post(
     const message = req.body;
 
     try {
-      await axios.post("http://localhost:5001/log", message);
+      await axios.post(GO_BACKEND_URL, message);
       console.log("Message forwarded to Go:", message);
       res.status(200).json({ status: "forwarded" });
     } catch (error) {
@@ -36,5 +42,5 @@ app.post("/log", (req: Request<{}, {}, MessageType>, res: Response) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`TypeScript backend is running at http://localhost:${PORT}`);
+  console.log(`TypeScript backend is running on port ${PORT}`);
 });
