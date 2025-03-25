@@ -2,10 +2,11 @@ package main
 
 import (
 	"testing"
+	"go-backend/types"
 )
 
 func TestMessageStructure(t *testing.T) {
-	msg := Message{
+	msg := types.Message{
 		From:    "go-service",
 		To:      "ts-service",
 		Message: "Hi there!",

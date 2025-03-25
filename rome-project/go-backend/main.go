@@ -2,58 +2,22 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"go-backend/db"
+	"go-backend/types"
+
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 )
-
-// Message used for communication via API (JSON)
-type Message struct {
-	From    string `json:"from"`
-	To      string `json:"to"`
-	Message string `json:"message"`
-	Date    string `json:"date"` // RFC3339 format
-}
-
-// DBMessage matches Prisma model for inserting into DB
-type DBMessage struct {
-	Sender    string
-	Receiver  string
-	Message   string
-	Timestamp time.Time
-}
-
-var db *sql.DB
-
-func initDB() {
-	var err error
-	dsn := os.Getenv("DATABASE_URL")
-	db, err = sql.Open("postgres", dsn)
-	if err != nil {
-		log.Fatal("❌ Failed to connect to database:", err)
-	}
-	if err = db.Ping(); err != nil {
-		log.Fatal("❌ Failed to ping database:", err)
-	}
-	log.Println("✅ Connected to database")
-}
-
-func insertMessageToDB(m DBMessage) error {
-	query := `INSERT INTO "Message" (sender, receiver, message, timestamp) VALUES ($1, $2, $3, $4)`
-	_, err := db.Exec(query, m.Sender, m.Receiver, m.Message, m.Timestamp)
-	return err
-}
 
 func handleSend(w http.ResponseWriter, r *http.Request) {
 	log.Println("Received POST /send")
 
-	var msg Message
+	var msg types.Message
 	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
 		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
 		return
@@ -61,27 +25,27 @@ func handleSend(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Forwarding message from %s to %s", msg.From, msg.To)
 
-	// Convert date to time.Time
 	t, err := time.Parse(time.RFC3339, msg.Date)
 	if err != nil {
 		http.Error(w, "Invalid date format", http.StatusBadRequest)
 		return
 	}
 
-	// Save to DB
-	dbMsg := DBMessage{
+	dbMsg := types.DBMessage{
 		Sender:    msg.From,
 		Receiver:  msg.To,
 		Message:   msg.Message,
 		Timestamp: t,
 	}
-	if err := insertMessageToDB(dbMsg); err != nil {
-		log.Println("❌ Failed to insert to DB:", err)
-		http.Error(w, "DB error", http.StatusInternalServerError)
-		return
+
+	if db.IsConnected() {
+		if err := db.InsertMessage(dbMsg); err != nil {
+			log.Println("❌ Failed to insert to DB:", err)
+		}
+	} else {
+		log.Println("⚠️ Skipped DB insert: not connected")
 	}
 
-	// Forward to TS
 	tsURL := os.Getenv("TS_BACKEND_URL")
 	if tsURL == "" {
 		tsURL = "http://localhost:5002/log"
@@ -101,7 +65,7 @@ func handleSend(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLog(w http.ResponseWriter, r *http.Request) {
-	var msg Message
+	var msg types.Message
 	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
 		http.Error(w, "Invalid message format", http.StatusBadRequest)
 		return
@@ -115,16 +79,19 @@ func handleLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dbMsg := DBMessage{
+	dbMsg := types.DBMessage{
 		Sender:    msg.From,
 		Receiver:  msg.To,
 		Message:   msg.Message,
 		Timestamp: t,
 	}
-	if err := insertMessageToDB(dbMsg); err != nil {
-		log.Println("❌ Failed to insert to DB:", err)
-		http.Error(w, "DB error", http.StatusInternalServerError)
-		return
+
+	if db.IsConnected() {
+		if err := db.InsertMessage(dbMsg); err != nil {
+			log.Println("❌ Failed to insert to DB:", err)
+		}
+	} else {
+		log.Println("⚠️ Skipped DB insert: not connected")
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -133,7 +100,7 @@ func handleLog(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	godotenv.Load()
-	initDB()
+	db.Init()
 
 	port := os.Getenv("PORT")
 	if port == "" {
