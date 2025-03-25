@@ -149,21 +149,100 @@ npm run test
 
 ---
 
-## 📦 Deployment (Render.com)
+## 🌍 Live Demo (Hosted on Render)
 
-Set environment variables in **Render Dashboard**:
-
-- `DATABASE_URL`
-- `GO_BACKEND_URL` (in TS service)
-- `TS_BACKEND_URL` (in Go service)
-- `PORT`
-
-Make sure to add:
-- **Build Command:** `npm install && npm run build`
-- **Start Command:** `npm run dev`
+| Service         | URL                                  |
+|------------------|--------------------------------------|
+| TypeScript (TS)  | [https://rome-ts.onrender.com](https://rome-ts.onrender.com) |
+| Go (Golang)      | [https://rome-go.onrender.com](https://rome-go.onrender.com) |
 
 ---
 
+## 🗃️ Public PostgreSQL Database
+
+You can test using our shared database. No setup required!
+
+- 🛠️ Prisma Ready
+- 📦 Logs messages with `from`, `to`, `message`, and `timestamp`
+### 🌐 External (Local Development):
+
+Feel free to use my database for test
+DATABASE_URL=postgresql://rome_db_user:FSDH7AOOUOXuUeIGOLPalKLsO0YwOHfS@dpg-cvh85ldrie7s73eld5s0-a.singapore-postgres.render.com/rome_db
+
+### 🔒 Internal (Render.com):
+DATABASE_URL=postgresql://rome_db_user:FSDH7AOOUOXuUeIGOLPalKLsO0YwOHfS@dpg-cvh85ldrie7s73eld5s0-a/rome_db
+
+
+---
+
+## 🔁 API Endpoints & Examples
+
+### 1. `POST /send` (Go)
+
+Forwards a message from Go to TypeScript backend and logs it to the DB.
+
+**URL**: `http://localhost:5001/send`
+
+```json
+{
+  "from": "go-service",
+  "to": "ts-service",
+  "message": "Hello from Go!",
+  "date": "2025-03-25T12:00:00Z"
+}
+```
+
+---
+### 2. POST /log (Go)
+Logs a message received from TypeScript (no forwarding).
+
+URL: http://localhost:5001/log
+
+```json
+{
+  "from": "ts-service",
+  "to": "go-service",
+  "message": "Hello from TypeScript!",
+  "date": "2025-03-25T12:00:00Z"
+}
+```
+### 3. GET /logs (Go)
+Fetches the latest 10 logs from the database.
+
+URL: http://localhost:5001/logs
+
+### 4. POST /send (TypeScript)
+Sends a message from TypeScript to Go and logs it in the database.
+
+URL: http://localhost:5002/send
+
+```json
+{
+  "from": "ts-service",
+  "to": "go-service",
+  "message": "Hello from TypeScript!",
+  "date": "2025-03-25T12:00:00Z"
+}
+```
+### 5. POST /log (TypeScript)
+Logs a message from Go into the database.
+
+URL: http://localhost:5002/log
+
+```json
+{
+  "from": "go-service",
+  "to": "ts-service",
+  "message": "Hello from Go!",
+  "date": "2025-03-25T12:00:00Z"
+}
+```
+### 6. GET /logs (TypeScript)
+Fetches the latest 10 logs from the database.
+
+URL: http://localhost:5002/logs
+
+
 ## 📄 License
 
-MIT — Built with ❤️ for Intania Hackathon.
+Built with ❤️ for Intania Hackathon.
