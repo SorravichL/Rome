@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "echo 'Skipping build for ts-node'",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "test": "jest",
     "dev": "ts-node src/server.ts",
     "lint": "eslint src --ext .ts",
