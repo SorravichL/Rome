@@ -1,0 +1,64 @@
+openapi: 3.0.0
+info:
+  title: Messaging API
+  version: 1.0.0
+
+paths:
+  /send:
+    post:
+      summary: Send message from external client to TS
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '200':
+          description: OK
+
+  /log:
+    post:
+      summary: Log a message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '200':
+          description: Logged
+
+  /send-to-go:
+    post:
+      summary: TS sends a message to Go
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '200':
+          description: Forwarded
+
+components:
+  schemas:
+    Message:
+      type: object
+      required:
+        - from
+        - to
+        - message
+        - date
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        message:
+          type: string
+        date:
+          type: string
+          format: date-time
