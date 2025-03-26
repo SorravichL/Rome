@@ -177,11 +177,11 @@ npm run test
 
 ## 🗃️ Public PostgreSQL Database
 
-You can test using our shared database. No setup required!
+Feel free to use my database for test. No setup required!
 
 - 🛠️ Prisma Ready
 - 📦 Logs messages with `from`, `to`, `message`, and `timestamp`
-### 🌐 External (Local Development), Feel free to use my database for test:
+### 🌐 External (Local Development):
 
 Feel free to use my database for test
 DATABASE_URL=postgresql://rome_db_user:FSDH7AOOUOXuUeIGOLPalKLsO0YwOHfS@dpg-cvh85ldrie7s73eld5s0-a.singapore-postgres.render.com/rome_db
@@ -210,10 +210,11 @@ Forwards a message from Go to TypeScript backend and logs it to the DB.
 ```
 
 ---
-### 2. POST /log (Go)
+
+### 2. `POST /log` (Go)
 Logs a message received from TypeScript (no forwarding).
 
-URL: http://localhost:5001/log
+**URL**: http://localhost:5001/log
 
 ```json
 {
@@ -223,15 +224,15 @@ URL: http://localhost:5001/log
   "date": "2025-03-25T12:00:00Z"
 }
 ```
-### 3. GET /logs (Go)
+### 3. `GET /logs` (Go)
 Fetches the latest 10 logs from the database.
 
-URL: http://localhost:5001/logs
+**URL**: http://localhost:5001/logs
 
-### 4. POST /send (TypeScript)
+### 4. `POST /send` (TypeScript)
 Sends a message from TypeScript to Go and logs it in the database.
 
-URL: http://localhost:5002/send
+**URL: http://localhost:5002/send**
 
 ```json
 {
@@ -241,10 +242,10 @@ URL: http://localhost:5002/send
   "date": "2025-03-25T12:00:00Z"
 }
 ```
-### 5. POST /log (TypeScript)
+### 5. `POST /log` (TypeScript)
 Logs a message from Go into the database.
 
-URL: http://localhost:5002/log
+**URL: http://localhost:5002/log**
 
 ```json
 {
@@ -254,10 +255,10 @@ URL: http://localhost:5002/log
   "date": "2025-03-25T12:00:00Z"
 }
 ```
-### 6. GET /logs (TypeScript)
+### 6. `GET /logs` (TypeScript)
 Fetches the latest 10 logs from the database.
 
-URL: http://localhost:5002/logs
+**URL**: http://localhost:5002/logs
 
 
 ## 📄 License
